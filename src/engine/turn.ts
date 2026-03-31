@@ -7,7 +7,7 @@ import { initCombat, resolveAttack, resolveDefend, resolveFlee, advanceTurn, dec
 import { scaleForFloor, getCreatureType, spawnEnemy } from './creatures';
 import { GEAR } from '../data/gear';
 import { CREATURE_TYPES } from '../data/creatures';
-import { MAX_PARTY_SIZE, STEPS_PER_SUPPLY } from './constants';
+import { MAX_PARTY_SIZE, STEPS_PER_SUPPLY, STARVATION_DAMAGE } from './constants';
 import { createFloor1, FLOOR_1_START } from '../data/dungeons/floor1';
 import { createFloor2 } from '../data/dungeons/floor2';
 import { createFloor3 } from '../data/dungeons/floor3';
@@ -198,7 +198,40 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       // Consume supplies on movement
       let resources = state.kingdom.resources;
       if (moved) {
-        resources = consumeSupplies(resources, STEPS_PER_SUPPLY); // consume 1 per move
+        resources = consumeSupplies(resources, STEPS_PER_SUPPLY);
+      }
+
+      // Starvation: deal damage to all party heroes when food or water is 0
+      let heroRoster = state.kingdom.heroRoster;
+      if (moved && (resources.food === 0 || resources.water === 0)) {
+        heroRoster = heroRoster.map(h => {
+          if (!state.party.includes(h.id) || !h.alive) return h;
+          const newHp = Math.max(0, h.stats.hp - STARVATION_DAMAGE);
+          return {
+            ...h,
+            stats: { ...h.stats, hp: newHp },
+            alive: newHp > 0,
+          };
+        });
+
+        // If all party heroes are dead, force retreat
+        const anyAlive = heroRoster.some(h => state.party.includes(h.id) && h.alive);
+        if (!anyAlive) {
+          return {
+            ...state,
+            screen: 'run_summary',
+            dungeon: null,
+            combat: null,
+            kingdom: { ...state.kingdom, resources, heroRoster },
+            runSummary: {
+              ...(state.runSummary ?? { goldEarned: 0, xpEarned: 0, enemiesDefeated: 0, heroesLost: [], loot: [] }),
+              heroesLost: state.party.filter(id => {
+                const h = heroRoster.find(h => h.id === id);
+                return !h || !h.alive;
+              }),
+            },
+          };
+        }
       }
 
       // Check encounter BEFORE enemy movement (player walks into enemy)
@@ -226,11 +259,11 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       if (encounter) {
         // Start combat
         const partyHeroes = state.party
-          .map(id => state.kingdom.heroRoster.find(h => h.id === id))
+          .map(id => heroRoster.find(h => h.id === id))
           .filter((h): h is Hero => h != null && h.alive);
 
         const creatureType = getCreatureType(encounter.creatureTypeId, CREATURE_TYPES);
-        if (!creatureType) return { ...state, dungeon: newDungeon, kingdom: { ...state.kingdom, resources } };
+        if (!creatureType) return { ...state, dungeon: newDungeon, kingdom: { ...state.kingdom, resources, heroRoster } };
 
         const scaled = scaleForFloor(creatureType, d.currentFloor);
         const heroCombatants = partyHeroes.map(h => heroToCombatant(h));
@@ -245,11 +278,11 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
           screen: 'combat',
           dungeon: newDungeon,
           combat,
-          kingdom: { ...state.kingdom, resources },
+          kingdom: { ...state.kingdom, resources, heroRoster },
         };
       }
 
-      return { ...state, dungeon: newDungeon, kingdom: { ...state.kingdom, resources } };
+      return { ...state, dungeon: newDungeon, kingdom: { ...state.kingdom, resources, heroRoster } };
     }
 
     case 'DESCEND_FLOOR': {

@@ -129,3 +129,48 @@ describe('encounter detection', () => {
     expect(s.combat!.enemyIds.length).toBe(1);
   });
 });
+
+describe('starvation', () => {
+  it('deals damage to party heroes when food is 0', () => {
+    let s = createInitialState();
+    s = resolveTurn(s, { type: 'NEW_GAME' });
+
+    const heroId = s.kingdom.tavernRoster[0].id;
+    s = resolveTurn(s, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+
+    const heroBefore = s.kingdom.heroRoster.find(h => h.id === heroId)!;
+    const hpBefore = heroBefore.stats.hp;
+
+    // Drain food to 0, clear enemies so we don't trigger combat
+    s.kingdom.resources.food = 0;
+    s.dungeon!.floors[s.dungeon!.currentFloor].enemies = [];
+
+    // Move forward — should take starvation damage
+    s = resolveTurn(s, { type: 'MOVE', direction: 'forward' });
+
+    const heroAfter = s.kingdom.heroRoster.find(h => h.id === heroId)!;
+    expect(heroAfter.stats.hp).toBeLessThan(hpBefore);
+  });
+
+  it('forces retreat when all party heroes die from starvation', () => {
+    let s = createInitialState();
+    s = resolveTurn(s, { type: 'NEW_GAME' });
+
+    const heroId = s.kingdom.tavernRoster[0].id;
+    s = resolveTurn(s, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+
+    // Set hero to 1 HP, drain food
+    s.kingdom.heroRoster = s.kingdom.heroRoster.map(h =>
+      h.id === heroId ? { ...h, stats: { ...h.stats, hp: 1 } } : h
+    );
+    s.kingdom.resources.food = 0;
+    s.dungeon!.floors[s.dungeon!.currentFloor].enemies = [];
+
+    s = resolveTurn(s, { type: 'MOVE', direction: 'forward' });
+
+    expect(s.screen).toBe('run_summary');
+    expect(s.dungeon).toBeNull();
+  });
+});
