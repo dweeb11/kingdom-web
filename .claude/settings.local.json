@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp:*)",
+      "Bash(cp -R /Users/davidpaolone-webb/projects/project-templates/games/* .)",
+      "Bash(cp -R /Users/davidpaolone-webb/projects/project-templates/games/.claude .)",
+      "Bash(mv CLAUDE.md.template CLAUDE.md)",
+      "Bash(mv AGENTS.md.template AGENTS.md)",
+      "Bash(mv GEMINI.md.template GEMINI.md)",
+      "Bash(/Users/davidpaolone-webb/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.6/skills/brainstorming/scripts/start-server.sh --project-dir /Users/davidpaolone-webb/projects/games/kingdom-web)",
+      "Bash(/Users/davidpaolone-webb/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.6/skills/brainstorming/scripts/stop-server.sh /Users/davidpaolone-webb/projects/games/kingdom-web/.superpowers/brainstorm/23361-1774931695)",
+      "Bash(sed -i '' 's|docs/superpowers/specs/2026-03-30-kingdom-web-design.md|docs/specs/2026-03-30-kingdom-web-design.md|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
+      "Bash(sed -i '' 's|docs/superpowers/specs/|docs/specs/|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
+      "Bash(sed -i '' 's|docs/superpowers/plans/|docs/plans/|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
+      "Bash(npm create:*)"
+    ]
+  }
+}
