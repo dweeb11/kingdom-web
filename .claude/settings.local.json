@@ -12,7 +12,10 @@
       "Bash(sed -i '' 's|docs/superpowers/specs/2026-03-30-kingdom-web-design.md|docs/specs/2026-03-30-kingdom-web-design.md|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
       "Bash(sed -i '' 's|docs/superpowers/specs/|docs/specs/|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
       "Bash(sed -i '' 's|docs/superpowers/plans/|docs/plans/|g' docs/plans/2026-03-30-kingdom-web-first-playable.md)",
-      "Bash(npm create:*)"
+      "Bash(npm create:*)",
+      "Bash(npm test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

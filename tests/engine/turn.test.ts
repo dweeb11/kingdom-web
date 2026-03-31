@@ -102,3 +102,30 @@ describe('full game loop', () => {
     expect(s.party).toEqual([]);
   });
 });
+
+describe('encounter detection', () => {
+  it('triggers combat when player walks onto an enemy tile', () => {
+    let s = createInitialState();
+    s = resolveTurn(s, { type: 'NEW_GAME' });
+
+    const heroId = s.kingdom.tavernRoster[0].id;
+    s = resolveTurn(s, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+
+    // Place a stationary enemy directly ahead of the player
+    // Player starts at (1,8) facing N. (1,7) is floor.
+    const floor = s.dungeon!.floors[s.dungeon!.currentFloor];
+    floor.enemies = [{
+      id: 'test_enemy',
+      creatureTypeId: 'shadow_rat',
+      position: { x: 1, y: 7 },
+      currentHp: 8,
+    }];
+
+    // Move forward — should land on enemy and trigger combat
+    s = resolveTurn(s, { type: 'MOVE', direction: 'forward' });
+    expect(s.screen).toBe('combat');
+    expect(s.combat).not.toBeNull();
+    expect(s.combat!.enemyIds.length).toBe(1);
+  });
+});

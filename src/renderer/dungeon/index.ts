@@ -45,15 +45,17 @@ export function renderDungeon(
       drawSideWalls(ctx, w, h, tile.distance, { left: true, right: true });
     }
 
-    // Check for enemies at this tile
-    const enemyHere = enemies.find(
-      e => e.position.x === tile.position.x && e.position.y === tile.position.y
-    );
-    if (enemyHere) {
-      const creatureType = creatureTypes[enemyHere.creatureTypeId];
-      if (creatureType) {
-        const pos = getCreatureScreenPosition(tile.distance, w, h);
-        drawCreatureSilhouette(ctx, pos.x, pos.y, pos.scale, creatureType.visual);
+    // Only draw enemies on walkable tiles (not on/behind walls)
+    if (tile.tileType !== 'wall') {
+      const enemyHere = enemies.find(
+        e => e.position.x === tile.position.x && e.position.y === tile.position.y
+      );
+      if (enemyHere) {
+        const creatureType = creatureTypes[enemyHere.creatureTypeId];
+        if (creatureType) {
+          const pos = getCreatureScreenPosition(tile.distance, w, h);
+          drawCreatureSilhouette(ctx, pos.x, pos.y, pos.scale, creatureType.visual);
+        }
       }
     }
   }

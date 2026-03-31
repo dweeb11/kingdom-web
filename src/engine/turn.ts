@@ -178,6 +178,9 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
         resources = consumeSupplies(resources, STEPS_PER_SUPPLY); // consume 1 per move
       }
 
+      // Check encounter BEFORE enemy movement (player walks into enemy)
+      let encounter = moved ? checkEncounter(newPos, floor.enemies) : null;
+
       // Move enemies
       const creatureMovementInfo: Record<string, { movement: string; detectionRange: number; fleeThreshold: number }> = {};
       for (const [id, ct] of Object.entries(CREATURE_TYPES)) {
@@ -185,8 +188,10 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       }
       const updatedFloor = moved ? moveEnemies(markVisited(floor, newPos), newPos, creatureMovementInfo) : floor;
 
-      // Check encounter
-      const encounter = moved ? checkEncounter(newPos, updatedFloor.enemies) : null;
+      // Also check AFTER enemy movement (enemy walks into player)
+      if (!encounter && moved) {
+        encounter = checkEncounter(newPos, updatedFloor.enemies);
+      }
 
       const newDungeon: DungeonState = {
         ...d,
