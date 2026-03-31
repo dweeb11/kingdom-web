@@ -125,7 +125,9 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
     }
 
     case 'ENTER_DUNGEON': {
-      if (state.party.length === 0) return state;
+      const aliveHeroes = state.kingdom.heroRoster.filter(h => h.alive);
+      if (aliveHeroes.length === 0) return state;
+      const partyIds = aliveHeroes.map(h => h.id);
 
       const floor1 = createFloor1();
       floor1.enemies = spawnFloorEnemies(0);
@@ -140,6 +142,7 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
         ...state,
         screen: 'dungeon',
         dungeon,
+        party: partyIds,
         runSummary: { goldEarned: 0, xpEarned: 0, enemiesDefeated: 0, heroesLost: [], loot: [] },
       };
     }

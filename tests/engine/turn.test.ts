@@ -25,14 +25,6 @@ describe('resolveTurn', () => {
     expect(result.kingdom.resources.gold).toBeLessThan(state.kingdom.resources.gold);
   });
 
-  it('handles SELECT_PARTY', () => {
-    const state = { ...createInitialState(), screen: 'kingdom' as const };
-    const heroId = state.kingdom.tavernRoster[0].id;
-    const afterHire = resolveTurn(state, { type: 'HIRE_HERO', heroId });
-    const result = resolveTurn(afterHire, { type: 'SELECT_PARTY', heroIds: [heroId] });
-    expect(result.party).toEqual([heroId]);
-  });
-
   it('handles BUY_SUPPLIES', () => {
     const state = { ...createInitialState(), screen: 'kingdom' as const };
     const result = resolveTurn(state, { type: 'BUY_SUPPLIES', item: 'food', quantity: 2 });
@@ -43,7 +35,6 @@ describe('resolveTurn', () => {
     const state = { ...createInitialState(), screen: 'kingdom' as const };
     const heroId = state.kingdom.tavernRoster[0].id;
     let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
-    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
     s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
     expect(s.screen).toBe('dungeon');
     expect(s.dungeon).not.toBeNull();
@@ -54,7 +45,6 @@ describe('resolveTurn', () => {
     const state = { ...createInitialState(), screen: 'kingdom' as const };
     const heroId = state.kingdom.tavernRoster[0].id;
     let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
-    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
     s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
     s = resolveTurn(s, { type: 'RETREAT' });
     expect(s.screen).toBe('run_summary');
@@ -64,7 +54,6 @@ describe('resolveTurn', () => {
     const state = { ...createInitialState(), screen: 'kingdom' as const };
     const heroId = state.kingdom.tavernRoster[0].id;
     let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
-    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
     s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
     s = resolveTurn(s, { type: 'RETREAT' });
     s = resolveTurn(s, { type: 'END_RUN' });
@@ -85,11 +74,7 @@ describe('full game loop', () => {
     s = resolveTurn(s, { type: 'HIRE_HERO', heroId });
     expect(s.kingdom.heroRoster.length).toBe(1);
 
-    // Select party
-    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
-    expect(s.party).toEqual([heroId]);
-
-    // Enter dungeon
+    // Enter dungeon (all hired heroes go automatically)
     s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
     expect(s.screen).toBe('dungeon');
     expect(s.dungeon).not.toBeNull();

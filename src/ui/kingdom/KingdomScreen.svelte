@@ -2,7 +2,6 @@
   import type { GameState, GameAction } from '../../engine/types';
   import ResourceBar from './ResourceBar.svelte';
   import Tavern from './Tavern.svelte';
-  import Gate from './Gate.svelte';
   import GeneralStore from './GeneralStore.svelte';
   import { renderSkyline, getBuildingAtPosition } from '../../renderer/kingdom/skyline';
   import { onMount } from 'svelte';
@@ -57,7 +56,17 @@
       {#if selectedBuilding === 'tavern'}
         <Tavern state={gameState} {onAction} />
       {:else if selectedBuilding === 'gate'}
-        <Gate gameState={gameState} {onAction} />
+        <div class="gate-panel">
+          <h3>GATE — Enter the Dungeon</h3>
+          {#if gameState.kingdom.heroRoster.filter(h => h.alive).length === 0}
+            <p class="empty">Hire heroes at the Tavern before venturing out.</p>
+          {:else}
+            <p class="info">Your party of {gameState.kingdom.heroRoster.filter(h => h.alive).length} will enter the dungeon.</p>
+            <button class="launch-btn" onclick={() => onAction({ type: 'ENTER_DUNGEON' })}>
+              ENTER DUNGEON
+            </button>
+          {/if}
+        </div>
       {:else if selectedBuilding === 'general_store'}
         <GeneralStore state={gameState} {onAction} />
       {:else}
@@ -100,6 +109,48 @@
     background: var(--bg-panel);
     border-left: 1px solid var(--line-dim);
     overflow-y: auto;
+  }
+
+  .gate-panel {
+    padding: 12px;
+  }
+
+  .gate-panel h3 {
+    font-size: 12px;
+    color: var(--accent-orange);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--line-dim);
+    padding-bottom: 4px;
+  }
+
+  .gate-panel .info {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .gate-panel .empty {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .launch-btn {
+    background: none;
+    border: 1px solid var(--accent-orange);
+    color: var(--accent-orange);
+    padding: 8px 24px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    width: 100%;
+  }
+
+  .launch-btn:hover {
+    background: var(--accent-orange);
+    color: var(--bg-primary);
   }
 
   .no-selection {
