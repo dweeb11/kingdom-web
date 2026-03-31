@@ -77,6 +77,7 @@ export interface Hero {
   weapon: GearItem | null;
   armor: GearItem | null;
   alive: boolean;
+  hireCost: number;
 }
 
 // --- Creatures ---

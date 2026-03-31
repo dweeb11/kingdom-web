@@ -56,7 +56,7 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       const hero = state.kingdom.tavernRoster.find(h => h.id === action.heroId);
       if (!hero) return state;
 
-      const cost = calculateHireCost();
+      const cost = hero.hireCost;
       if (!canAfford(state.kingdom.resources, cost)) return state;
 
       return {

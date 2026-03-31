@@ -2,9 +2,10 @@
   import type { Hero } from '../../engine/types';
   import { composeCreatureSvg } from '../../renderer/creatures/composer';
 
-  let { hero, compact = false, onclick }: {
+  let { hero, compact = false, showCost = false, onclick }: {
     hero: Hero;
     compact?: boolean;
+    showCost?: boolean;
     onclick?: () => void;
   } = $props();
 
@@ -27,6 +28,9 @@
   <div class="hero-header">
     <span class="hero-name">{hero.name}</span>
     <span class="hero-class" style="color: {classColor}">{hero.heroClass.toUpperCase()}</span>
+    {#if showCost}
+      <span class="hire-cost">{hero.hireCost}g</span>
+    {/if}
   </div>
 
   {#if !compact}
@@ -90,6 +94,11 @@
   .hero-class {
     font-size: 10px;
     letter-spacing: 1px;
+  }
+
+  .hire-cost {
+    color: var(--accent-gold);
+    font-size: 10px;
   }
 
   .hero-stats {

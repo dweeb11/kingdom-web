@@ -18,6 +18,7 @@
       {#each state.kingdom.tavernRoster as hero (hero.id)}
         <HeroCard
           {hero}
+          showCost
           onclick={() => onAction({ type: 'HIRE_HERO', heroId: hero.id })}
         />
       {/each}

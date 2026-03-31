@@ -18,6 +18,7 @@ function makeHero(overrides: Partial<Hero> = {}): Hero {
     weapon: null,
     armor: null,
     alive: true,
+    hireCost: 30,
     ...overrides,
   };
 }

@@ -7,6 +7,7 @@ import {
   STARTING_TORCHES,
   TAVERN_ROSTER_SIZE,
   BASE_STATS,
+  HERO_HIRE_COST,
 } from './constants';
 
 let nextId = 1;
@@ -48,6 +49,7 @@ export function generateHero(): Hero {
     weapon: null,
     armor: null,
     alive: true,
+    hireCost: Math.floor(Math.random() * (HERO_HIRE_COST.max - HERO_HIRE_COST.min + 1)) + HERO_HIRE_COST.min,
   };
 }
 
