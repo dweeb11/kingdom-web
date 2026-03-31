@@ -1,0 +1,95 @@
+import type { GearItem } from '../engine/types';
+
+export const GEAR: Record<string, GearItem> = {
+  // Weapons
+  iron_sword: {
+    id: 'iron_sword',
+    name: 'Iron Sword',
+    slot: 'weapon',
+    attackBonus: 3,
+    defenseBonus: 0,
+    proficiencies: ['warrior', 'rogue'],
+  },
+  steel_sword: {
+    id: 'steel_sword',
+    name: 'Steel Sword',
+    slot: 'weapon',
+    attackBonus: 5,
+    defenseBonus: 0,
+    proficiencies: ['warrior'],
+  },
+  dagger: {
+    id: 'dagger',
+    name: 'Dagger',
+    slot: 'weapon',
+    attackBonus: 2,
+    defenseBonus: 0,
+    proficiencies: ['rogue', 'mage'],
+  },
+  twin_daggers: {
+    id: 'twin_daggers',
+    name: 'Twin Daggers',
+    slot: 'weapon',
+    attackBonus: 4,
+    defenseBonus: 1,
+    proficiencies: ['rogue'],
+  },
+  oak_staff: {
+    id: 'oak_staff',
+    name: 'Oak Staff',
+    slot: 'weapon',
+    attackBonus: 2,
+    defenseBonus: 1,
+    proficiencies: ['mage'],
+  },
+  crystal_staff: {
+    id: 'crystal_staff',
+    name: 'Crystal Staff',
+    slot: 'weapon',
+    attackBonus: 4,
+    defenseBonus: 2,
+    proficiencies: ['mage'],
+  },
+
+  // Armor
+  leather_armor: {
+    id: 'leather_armor',
+    name: 'Leather Armor',
+    slot: 'armor',
+    attackBonus: 0,
+    defenseBonus: 2,
+    proficiencies: ['warrior', 'rogue'],
+  },
+  chainmail: {
+    id: 'chainmail',
+    name: 'Chainmail',
+    slot: 'armor',
+    attackBonus: 0,
+    defenseBonus: 4,
+    proficiencies: ['warrior'],
+  },
+  plate_armor: {
+    id: 'plate_armor',
+    name: 'Plate Armor',
+    slot: 'armor',
+    attackBonus: 0,
+    defenseBonus: 6,
+    proficiencies: ['warrior'],
+  },
+  shadow_cloak: {
+    id: 'shadow_cloak',
+    name: 'Shadow Cloak',
+    slot: 'armor',
+    attackBonus: 0,
+    defenseBonus: 2,
+    proficiencies: ['rogue', 'mage'],
+  },
+  arcane_robes: {
+    id: 'arcane_robes',
+    name: 'Arcane Robes',
+    slot: 'armor',
+    attackBonus: 1,
+    defenseBonus: 2,
+    proficiencies: ['mage'],
+  },
+};
