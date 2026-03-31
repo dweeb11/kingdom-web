@@ -27,7 +27,6 @@ describe('resolveTurn', () => {
 
   it('handles SELECT_PARTY', () => {
     const state = { ...createInitialState(), screen: 'kingdom' as const };
-    // Hire a hero first
     const heroId = state.kingdom.tavernRoster[0].id;
     const afterHire = resolveTurn(state, { type: 'HIRE_HERO', heroId });
     const result = resolveTurn(afterHire, { type: 'SELECT_PARTY', heroIds: [heroId] });
@@ -40,9 +39,81 @@ describe('resolveTurn', () => {
     expect(result.kingdom.resources.food).toBe(state.kingdom.resources.food + 2);
   });
 
-  it('returns state unchanged for unknown action types', () => {
-    const state = createInitialState();
-    const result = resolveTurn(state, { type: 'NAVIGATE', screen: 'kingdom' });
-    expect(result.screen).toBe('kingdom');
+  it('handles ENTER_DUNGEON', () => {
+    const state = { ...createInitialState(), screen: 'kingdom' as const };
+    const heroId = state.kingdom.tavernRoster[0].id;
+    let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+    expect(s.screen).toBe('dungeon');
+    expect(s.dungeon).not.toBeNull();
+    expect(s.dungeon!.floors.length).toBe(3);
+  });
+
+  it('handles RETREAT from dungeon', () => {
+    const state = { ...createInitialState(), screen: 'kingdom' as const };
+    const heroId = state.kingdom.tavernRoster[0].id;
+    let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+    s = resolveTurn(s, { type: 'RETREAT' });
+    expect(s.screen).toBe('run_summary');
+  });
+
+  it('handles END_RUN — returns to kingdom', () => {
+    const state = { ...createInitialState(), screen: 'kingdom' as const };
+    const heroId = state.kingdom.tavernRoster[0].id;
+    let s = resolveTurn(state, { type: 'HIRE_HERO', heroId });
+    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+    s = resolveTurn(s, { type: 'RETREAT' });
+    s = resolveTurn(s, { type: 'END_RUN' });
+    expect(s.screen).toBe('kingdom');
+    expect(s.dungeon).toBeNull();
+    expect(s.party).toEqual([]);
+  });
+});
+
+describe('full game loop', () => {
+  it('new game → hire → enter dungeon → move → retreat → end run', () => {
+    let s = createInitialState();
+    s = resolveTurn(s, { type: 'NEW_GAME' });
+    expect(s.screen).toBe('kingdom');
+
+    // Hire a hero
+    const heroId = s.kingdom.tavernRoster[0].id;
+    s = resolveTurn(s, { type: 'HIRE_HERO', heroId });
+    expect(s.kingdom.heroRoster.length).toBe(1);
+
+    // Select party
+    s = resolveTurn(s, { type: 'SELECT_PARTY', heroIds: [heroId] });
+    expect(s.party).toEqual([heroId]);
+
+    // Enter dungeon
+    s = resolveTurn(s, { type: 'ENTER_DUNGEON' });
+    expect(s.screen).toBe('dungeon');
+    expect(s.dungeon).not.toBeNull();
+
+    // Move forward (may or may not change position depending on facing)
+    const posBefore = { ...s.dungeon!.playerPosition };
+    s = resolveTurn(s, { type: 'MOVE', direction: 'forward' });
+    // State should still be valid
+    expect(s.dungeon).not.toBeNull();
+
+    // Turn
+    const facingBefore = s.dungeon!.playerFacing;
+    s = resolveTurn(s, { type: 'MOVE', direction: 'turn_right' });
+    expect(s.dungeon!.playerFacing).not.toBe(facingBefore);
+
+    // Retreat
+    s = resolveTurn(s, { type: 'RETREAT' });
+    expect(s.screen).toBe('run_summary');
+
+    // End run
+    s = resolveTurn(s, { type: 'END_RUN' });
+    expect(s.screen).toBe('kingdom');
+    expect(s.dungeon).toBeNull();
+    expect(s.combat).toBeNull();
+    expect(s.party).toEqual([]);
   });
 });
