@@ -1,48 +1,54 @@
-# CLAUDE.md
+# Kingdom Web
 
-## First Session Orientation
+## Vision
+Web-based kingdom management / grid dungeon crawler. Design lab for Kingdom Crawler —
+explore game systems with more depth using programmatic vector art. Not a port, a parallel
+exploration. Lessons feed back into the Godot version.
 
-Before doing anything, read these files in order:
-1. `PITCH.md` — the human's design vision (never modify)
-2. `WORKING_AGREEMENT.md` — how we work together
-3. `WORKING_AGREEMENT.games.md` — game-specific conventions
-4. `GIT_CONVENTIONS.md` — branching and commit rules
-5. This file — project-specific architecture and conventions
+## Tech Stack
+TypeScript, web browser, programmatic art (SVG/Canvas 2D/shaders). Zero external art assets.
+
+## Quick Start
+[TBD — fill in as project matures]
+
+## Architecture
+[TBD — fill in as project matures. See docs/design/kingdom-web-design.md for current spec]
 
 ---
 
-## Project Overview
+## Process
 
-[CUSTOMIZE: What is this game? Engine/framework? Genre? Target platform?]
-
-## Architecture
-
-[CUSTOMIZE: Scene flow, core systems, key scripts, autoloads]
-
-## Running the Game
-
-[CUSTOMIZE: How to run, build, test]
-
-```bash
-# Run
-# Build
-# Test
+```
+  VISION ──▸ ART DIR ──▸ DESIGN ──▸ MILESTONE ──▸ IMPLEMENT ──▸ VERIFY ──▸ SHIP
+             (programmatic)  docs/design/  docs/milestones/  branch+test  evidence  merge via PR
 ```
 
-## Key Constants
+## Agent Roles
 
-[CUSTOMIZE: Design resolution, physics values, timing constants]
+**You are Producer + Engineer. The human is Designer + Assistant Producer.**
+- Own the process — update milestone checklists as you complete tasks
+- Surface design decisions — don't make them, flag them and wait
+- Commit after each task, not at end of session
 
-## Key Conventions
+## Testing
 
-[CUSTOMIZE: Engine-specific rules, typing conventions, input mapping]
+| Code Type | Approach |
+|-----------|----------|
+| Game logic, state, systems | Test FIRST |
+| Rendering, UI, interactions | Manual acceptance criteria |
 
-## Documentation
+## Git
 
-- `PITCH.md` — Design vision (human-owned, never modify)
-- `SCRATCH.md` — Runtime notes (human-owned, never modify)
-- `WORKING_AGREEMENT.md` — Development process
-- `WORKING_AGREEMENT.games.md` — Game-specific conventions
-- `GIT_CONVENTIONS.md` — Branching and commits
-- `docs/milestones/` — Specs and milestone checklists
-- `docs/worklogs/` — Feature worklogs
+- Branch per feature: `feat/`, `fix/`, `docs/`, `refactor/`
+- PRs for all merges
+- Commit after every completed task
+
+## Knowledge
+
+**Read `.claude/knowledge/` before starting work.** Update when you discover non-obvious patterns or gotchas. Max 5 files, 50 lines each.
+
+## Non-Negotiables
+
+- Plans save to `docs/milestones/` or `docs/design/` — NEVER `docs/superpowers/`
+- No date-prefixed filenames
+- PITCH.md and SCRATCH.md are human-owned — never modify
