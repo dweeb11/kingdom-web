@@ -12,6 +12,29 @@ import { createFloor1, FLOOR_1_START } from '../data/dungeons/floor1';
 import { createFloor2 } from '../data/dungeons/floor2';
 import { createFloor3 } from '../data/dungeons/floor3';
 
+import type { CombatState } from './types';
+
+/** Process all enemy turns until a hero's turn or combat ends. */
+function processEnemyTurns(combat: CombatState): CombatState {
+  while (!combat.resolved) {
+    const nextId = combat.turnOrder[combat.currentTurnIndex];
+    if (combat.heroIds.includes(nextId)) break;
+
+    const enemyCombatant = combat.combatants.find(c => c.id === nextId);
+    if (!enemyCombatant || enemyCombatant.hp <= 0) {
+      combat = advanceTurn(combat);
+      continue;
+    }
+
+    const enemyAction = decideEnemyAction(combat, nextId);
+    if (enemyAction.type === 'attack') {
+      combat = resolveAttack(combat, nextId, enemyAction.targetId);
+    }
+    combat = advanceTurn(combat);
+  }
+  return combat;
+}
+
 function spawnFloorEnemies(floorNumber: number): import('./types').EnemyInstance[] {
   // Place enemies at fixed positions per floor
   const enemyConfigs: Array<{ typeId: string; pos: import('./types').Position }> = [];
@@ -212,7 +235,10 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
         const scaled = scaleForFloor(creatureType, d.currentFloor);
         const heroCombatants = partyHeroes.map(h => heroToCombatant(h));
         const enemyCombatants = [enemyToCombatant(encounter, scaled)];
-        const combat = initCombat(heroCombatants, enemyCombatants);
+        let combat = initCombat(heroCombatants, enemyCombatants);
+
+        // If enemies go first (higher speed), process their turns immediately
+        combat = processEnemyTurns(combat);
 
         return {
           ...state,
@@ -285,22 +311,7 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       }
 
       // Process enemy turns until a hero's turn or combat ends
-      while (!combat.resolved) {
-        const nextId = combat.turnOrder[combat.currentTurnIndex];
-        if (combat.heroIds.includes(nextId)) break;
-
-        const enemyCombatant = combat.combatants.find(c => c.id === nextId);
-        if (!enemyCombatant || enemyCombatant.hp <= 0) {
-          combat = advanceTurn(combat);
-          continue;
-        }
-
-        const enemyAction = decideEnemyAction(combat, nextId);
-        if (enemyAction.type === 'attack') {
-          combat = resolveAttack(combat, nextId, enemyAction.targetId);
-        }
-        combat = advanceTurn(combat);
-      }
+      combat = processEnemyTurns(combat);
 
       // If combat resolved, calculate rewards
       if (combat.resolved && !combat.playerFled) {

@@ -1,54 +1,95 @@
 <script lang="ts">
   import type { Hero } from '../../engine/types';
+  import { MAX_PARTY_SIZE } from '../../engine/constants';
 
   let { heroes }: { heroes: Hero[] } = $props();
 
-  let aliveHeroes = $derived(heroes.filter(h => h.alive));
+  let slots = $derived(
+    Array.from({ length: MAX_PARTY_SIZE }, (_, i) => heroes[i] ?? null)
+  );
 </script>
 
-{#if aliveHeroes.length > 0}
-  <div class="party-bar">
-    {#each aliveHeroes as hero (hero.id)}
-      <div class="party-member">
-        <span class="name">{hero.name}</span>
-        <span class="class" style="color: {hero.heroClass === 'warrior' ? '#ff8c00' : hero.heroClass === 'rogue' ? '#7cfc00' : '#4488ff'}">{hero.heroClass.toUpperCase()}</span>
-        <span class="level">LV{hero.level}</span>
-        <div class="hp-wrap">
-          <div class="hp-fill" style="width: {Math.round((hero.stats.hp / hero.stats.maxHp) * 100)}%"></div>
+<div class="party-bar">
+  {#each slots as hero, i (i)}
+    <div class="party-slot" class:empty={!hero} class:dead={hero && !hero.alive}>
+      {#if hero}
+        <div class="slot-header">
+          <span class="name">{hero.name}</span>
+          <span class="class-badge" style="color: {hero.heroClass === 'warrior' ? '#ff8c00' : hero.heroClass === 'rogue' ? '#7cfc00' : '#4488ff'}">{hero.heroClass.toUpperCase()}</span>
         </div>
-        <span class="hp-text">{hero.stats.hp}/{hero.stats.maxHp}</span>
-      </div>
-    {/each}
-  </div>
-{/if}
+        <div class="slot-stats">
+          <span class="level">LV{hero.level}</span>
+          <div class="hp-wrap">
+            <div class="hp-fill" style="width: {Math.round((hero.stats.hp / hero.stats.maxHp) * 100)}%"></div>
+          </div>
+          <span class="hp-text">{hero.stats.hp}/{hero.stats.maxHp}</span>
+        </div>
+      {:else}
+        <span class="empty-label">—</span>
+      {/if}
+    </div>
+  {/each}
+</div>
 
 <style>
   .party-bar {
-    display: flex;
-    gap: 12px;
-    padding: 8px 12px;
-    background: var(--bg-secondary);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: 4px;
+    background: var(--bg-primary);
     border-top: 1px solid var(--line-dim);
     flex-shrink: 0;
   }
 
-  .party-member {
+  .party-slot {
+    background: var(--bg-secondary);
+    padding: 6px 8px;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .party-slot.empty {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    flex: 1;
-    min-width: 0;
+    justify-content: center;
+  }
+
+  .party-slot.dead {
+    opacity: 0.3;
+  }
+
+  .empty-label {
+    color: var(--line-dim);
+    font-size: 14px;
+  }
+
+  .slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .name {
     color: var(--text-primary);
+    font-size: 11px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .class {
+  .class-badge {
     font-size: 8px;
     letter-spacing: 1px;
+  }
+
+  .slot-stats {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
   }
 
   .level {
@@ -60,7 +101,7 @@
     flex: 1;
     height: 4px;
     background: var(--line-dim);
-    min-width: 30px;
+    min-width: 20px;
   }
 
   .hp-fill {
