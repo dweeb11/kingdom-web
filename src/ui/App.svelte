@@ -1,22 +1,42 @@
 <script lang="ts">
-  import type { GameState, GameAction } from '../engine/types';
+  import type { GameAction } from '../engine/types';
+  import { createInitialState } from '../engine/state';
+  import { resolveTurn } from '../engine/turn';
+  import { saveToLocalStorage, loadFromLocalStorage, serialize } from '../engine/save';
   import KingdomScreen from './kingdom/KingdomScreen.svelte';
   import TitleScreen from './screens/TitleScreen.svelte';
   import DungeonScreen from './dungeon/DungeonScreen.svelte';
   import RunSummary from './screens/RunSummary.svelte';
 
-  let { state, onAction }: {
-    state: GameState;
-    onAction: (action: GameAction) => void;
-  } = $props();
+  let gameState = $state(loadFromLocalStorage() ?? createInitialState());
+
+  function onAction(action: GameAction) {
+    gameState = resolveTurn(gameState, action);
+
+    if (gameState.screen === 'kingdom' || gameState.screen === 'run_summary') {
+      saveToLocalStorage(gameState);
+    }
+  }
+
+  // Export save for dev console
+  (window as any).__exportSave = () => {
+    const json = serialize(gameState);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kingdom-save.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 </script>
 
-{#if state.screen === 'title'}
-  <TitleScreen gameState={state} {onAction} />
-{:else if state.screen === 'kingdom'}
-  <KingdomScreen gameState={state} {onAction} />
-{:else if state.screen === 'dungeon' || state.screen === 'combat'}
-  <DungeonScreen {state} {onAction} />
-{:else if state.screen === 'run_summary'}
-  <RunSummary {state} {onAction} />
+{#if gameState.screen === 'title'}
+  <TitleScreen {gameState} {onAction} />
+{:else if gameState.screen === 'kingdom'}
+  <KingdomScreen {gameState} {onAction} />
+{:else if gameState.screen === 'dungeon' || gameState.screen === 'combat'}
+  <DungeonScreen {gameState} {onAction} />
+{:else if gameState.screen === 'run_summary'}
+  <RunSummary {gameState} {onAction} />
 {/if}

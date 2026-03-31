@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { GameState, GameAction } from '../../engine/types';
 
-  let { state, onAction }: {
-    state: GameState;
+  let { gameState, onAction }: {
+    gameState: GameState;
     onAction: (action: GameAction) => void;
   } = $props();
 </script>
@@ -10,13 +10,13 @@
 <div class="run-summary">
   <h2>EXPEDITION COMPLETE</h2>
 
-  {#if state.runSummary}
+  {#if gameState.runSummary}
     <div class="stats">
-      <p>Gold earned: {state.runSummary.goldEarned}</p>
-      <p>XP earned: {state.runSummary.xpEarned}</p>
-      <p>Enemies defeated: {state.runSummary.enemiesDefeated}</p>
-      {#if state.runSummary.heroesLost.length > 0}
-        <p class="losses">Heroes lost: {state.runSummary.heroesLost.length}</p>
+      <p>Gold earned: {gameState.runSummary.goldEarned}</p>
+      <p>XP earned: {gameState.runSummary.xpEarned}</p>
+      <p>Enemies defeated: {gameState.runSummary.enemiesDefeated}</p>
+      {#if gameState.runSummary.heroesLost.length > 0}
+        <p class="losses">Heroes lost: {gameState.runSummary.heroesLost.length}</p>
       {/if}
     </div>
   {:else}

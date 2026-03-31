@@ -7,8 +7,8 @@
   import DungeonHud from './DungeonHud.svelte';
   import CombatHud from './CombatHud.svelte';
 
-  let { state: gameState, onAction }: {
-    state: GameState;
+  let { gameState, onAction }: {
+    gameState: GameState;
     onAction: (action: GameAction) => void;
   } = $props();
 
