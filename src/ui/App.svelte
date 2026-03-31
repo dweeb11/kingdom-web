@@ -12,7 +12,7 @@
 </script>
 
 {#if state.screen === 'title'}
-  <TitleScreen {state} {onAction} />
+  <TitleScreen gameState={state} {onAction} />
 {:else if state.screen === 'kingdom'}
   <KingdomScreen gameState={state} {onAction} />
 {:else if state.screen === 'dungeon' || state.screen === 'combat'}
