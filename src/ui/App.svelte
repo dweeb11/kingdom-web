@@ -7,6 +7,7 @@
   import TitleScreen from './screens/TitleScreen.svelte';
   import DungeonScreen from './dungeon/DungeonScreen.svelte';
   import RunSummary from './screens/RunSummary.svelte';
+  import PartyBar from './shared/PartyBar.svelte';
 
   let gameState = $state(loadFromLocalStorage() ?? createInitialState());
 
@@ -31,12 +32,33 @@
   };
 </script>
 
-{#if gameState.screen === 'title'}
-  <TitleScreen {gameState} {onAction} />
-{:else if gameState.screen === 'kingdom'}
-  <KingdomScreen {gameState} {onAction} />
-{:else if gameState.screen === 'dungeon' || gameState.screen === 'combat'}
-  <DungeonScreen {gameState} {onAction} />
-{:else if gameState.screen === 'run_summary'}
-  <RunSummary {gameState} {onAction} />
-{/if}
+<div class="app-layout">
+  <div class="screen-area">
+    {#if gameState.screen === 'title'}
+      <TitleScreen {gameState} {onAction} />
+    {:else if gameState.screen === 'kingdom'}
+      <KingdomScreen {gameState} {onAction} />
+    {:else if gameState.screen === 'dungeon' || gameState.screen === 'combat'}
+      <DungeonScreen {gameState} {onAction} />
+    {:else if gameState.screen === 'run_summary'}
+      <RunSummary {gameState} {onAction} />
+    {/if}
+  </div>
+  {#if gameState.screen !== 'title'}
+    <PartyBar heroes={gameState.kingdom.heroRoster} />
+  {/if}
+</div>
+
+<style>
+  .app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .screen-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+</style>

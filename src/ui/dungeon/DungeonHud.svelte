@@ -6,12 +6,6 @@
     onAction: (action: GameAction) => void;
   } = $props();
 
-  let partyHeroes = $derived(
-    gameState.party
-      .map(id => gameState.kingdom.heroRoster.find(h => h.id === id))
-      .filter(h => h != null)
-  );
-
   let currentTile = $derived(
     gameState.dungeon
       ? gameState.dungeon.floors[gameState.dungeon.currentFloor]
@@ -24,41 +18,29 @@
 
 <div class="dungeon-hud">
   <div class="hud-top">
-    <div class="party-status">
-      {#each partyHeroes as hero}
-        {#if hero}
-          <div class="hero-mini" class:dead={!hero.alive}>
-            <span class="name">{hero.name}</span>
-            <span class="hp">{hero.stats.hp}/{hero.stats.maxHp}</span>
-          </div>
-        {/if}
-      {/each}
-    </div>
-
     <div class="supplies">
       <span>{gameState.kingdom.resources.food} food</span>
       <span>{gameState.kingdom.resources.water} water</span>
       <span>{gameState.kingdom.resources.torches} torches</span>
+    </div>
+
+    <div class="hud-actions">
+      {#if canDescend}
+        <button class="descend-btn" onclick={() => onAction({ type: 'DESCEND_FLOOR' })}>
+          DESCEND
+        </button>
+      {/if}
+      <button class="retreat-btn" onclick={() => onAction({ type: 'RETREAT' })}>
+        RETREAT
+      </button>
     </div>
   </div>
 
   {#if gameState.dungeon}
     <div class="location">
       Floor {gameState.dungeon.currentFloor + 1} — Facing {gameState.dungeon.playerFacing}
-      ({gameState.dungeon.playerPosition.x}, {gameState.dungeon.playerPosition.y})
     </div>
   {/if}
-
-  <div class="hud-actions">
-    {#if canDescend}
-      <button class="descend-btn" onclick={() => onAction({ type: 'DESCEND_FLOOR' })}>
-        DESCEND
-      </button>
-    {/if}
-    <button class="retreat-btn" onclick={() => onAction({ type: 'RETREAT' })}>
-      RETREAT
-    </button>
-  </div>
 </div>
 
 <style>
@@ -75,29 +57,7 @@
   .hud-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .party-status {
-    display: flex;
-    gap: 12px;
-  }
-
-  .hero-mini {
-    font-size: 10px;
-  }
-
-  .hero-mini.dead {
-    opacity: 0.3;
-  }
-
-  .name {
-    color: var(--text-primary);
-  }
-
-  .hp {
-    color: var(--accent-red);
-    margin-left: 4px;
+    align-items: center;
   }
 
   .supplies {
@@ -116,7 +76,6 @@
   .hud-actions {
     display: flex;
     gap: 8px;
-    margin-top: 6px;
   }
 
   .descend-btn, .retreat-btn {
