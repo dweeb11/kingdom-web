@@ -8,13 +8,13 @@ export function getFeatureOverlay(feature: string, size: number): string {
   switch (feature) {
     case 'horns':
       return `
-        <line x1="${cx - s * 0.15}" y1="${cy - s * 0.7}" x2="${cx - s * 0.35}" y2="${cy - s * 1.1}" stroke="currentColor" stroke-width="1.5" />
-        <line x1="${cx + s * 0.15}" y1="${cy - s * 0.7}" x2="${cx + s * 0.35}" y2="${cy - s * 1.1}" stroke="currentColor" stroke-width="1.5" />
+        <line x1="${cx - s * 0.15}" y1="${cy - s * 0.7}" x2="${cx - s * 0.35}" y2="${cy - s * 1.1}" stroke="currentColor" stroke-opacity="0.95" />
+        <line x1="${cx + s * 0.15}" y1="${cy - s * 0.7}" x2="${cx + s * 0.35}" y2="${cy - s * 1.1}" stroke="currentColor" stroke-opacity="0.95" />
       `;
     case 'fangs':
       return `
-        <line x1="${cx - s * 0.08}" y1="${cy - s * 0.45}" x2="${cx - s * 0.1}" y2="${cy - s * 0.3}" stroke="currentColor" stroke-width="1.5" />
-        <line x1="${cx + s * 0.08}" y1="${cy - s * 0.45}" x2="${cx + s * 0.1}" y2="${cy - s * 0.3}" stroke="currentColor" stroke-width="1.5" />
+        <line x1="${cx - s * 0.08}" y1="${cy - s * 0.45}" x2="${cx - s * 0.1}" y2="${cy - s * 0.3}" stroke="currentColor" stroke-opacity="0.95" />
+        <line x1="${cx + s * 0.08}" y1="${cy - s * 0.45}" x2="${cx + s * 0.1}" y2="${cy - s * 0.3}" stroke="currentColor" stroke-opacity="0.95" />
       `;
     case 'claws':
       return `
@@ -26,7 +26,7 @@ export function getFeatureOverlay(feature: string, size: number): string {
     case 'tail':
       return `
         <path d="M ${cx} ${cy + s * 0.8} C ${cx + s * 0.3} ${cy + s * 1.1} ${cx + s * 0.5} ${cy + s * 0.9} ${cx + s * 0.4} ${cy + s * 0.7}"
-              fill="none" stroke="currentColor" />
+              fill="none" stroke="currentColor" stroke-opacity="0.85" />
       `;
     case 'wings':
       return `
@@ -50,7 +50,7 @@ export function getCrossHatchOverlay(size: number, density: number): string {
   const s = size * 0.35;
   const cx = size / 2;
   const cy = size / 2;
-  const opacity = density * 0.3;
+  const opacity = density * 0.24;
 
   for (let i = -s; i < s; i += spacing) {
     lines.push(

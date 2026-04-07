@@ -1,4 +1,4 @@
-import type { DungeonFloor, Position } from '../../engine/types';
+import type { DungeonFloor, DungeonTile, Position } from '../../engine/types';
 
 const LAYOUT = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -16,7 +16,7 @@ const LAYOUT = [
 export const FLOOR_3_START: Position = { x: 1, y: 1 };
 
 export function createFloor3(): DungeonFloor {
-  const tiles = LAYOUT.map(row =>
+  const tiles: DungeonTile[][] = LAYOUT.map(row =>
     row.map(cell => ({
       type: cell === 1 ? 'floor' as const : 'wall' as const,
       visible: false,

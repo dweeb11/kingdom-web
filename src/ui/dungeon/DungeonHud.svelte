@@ -19,9 +19,9 @@
 <div class="dungeon-hud">
   <div class="hud-top">
     <div class="supplies">
-      <span>{gameState.kingdom.resources.food} food</span>
-      <span>{gameState.kingdom.resources.water} water</span>
-      <span>{gameState.kingdom.resources.torches} torches</span>
+      <span class="pill food">FOOD {gameState.kingdom.resources.food}</span>
+      <span class="pill water">WATER {gameState.kingdom.resources.water}</span>
+      <span class="pill torch">TORCH {gameState.kingdom.resources.torches}</span>
     </div>
 
     <div class="hud-actions">
@@ -49,9 +49,10 @@
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(8, 8, 8, 0.8);
+    background: linear-gradient(to bottom, rgba(7, 9, 14, 0.95), rgba(7, 9, 14, 0.72));
     padding: 8px 12px;
     border-bottom: 1px solid var(--line-dim);
+    backdrop-filter: blur(1px);
   }
 
   .hud-top {
@@ -62,15 +63,37 @@
 
   .supplies {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     font-size: 10px;
     color: var(--text-secondary);
   }
 
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--line-dim);
+    padding: 2px 6px;
+    letter-spacing: 0.4px;
+  }
+
+  .pill.food {
+    color: #d4c49a;
+  }
+
+  .pill.water {
+    color: #95badf;
+  }
+
+  .pill.torch {
+    color: #d6a36e;
+  }
+
   .location {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--text-secondary);
     margin-top: 4px;
+    letter-spacing: 0.8px;
   }
 
   .hud-actions {
@@ -79,13 +102,14 @@
   }
 
   .descend-btn, .retreat-btn {
-    background: none;
+    background: rgba(16, 18, 26, 0.8);
     border: 1px solid var(--line-dim);
     color: var(--text-secondary);
-    padding: 2px 8px;
+    padding: 3px 8px;
     cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 10px;
+    letter-spacing: 0.7px;
   }
 
   .descend-btn:hover {

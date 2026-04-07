@@ -52,9 +52,15 @@ export function drawCreatureSilhouette(
 ): void {
   const size = Math.max(20, scale * 80);
   const opacity = Math.min(1, scale * 1.5);
+  const stroke = Math.max(1.5, visual.lineWeight * (0.9 + scale * 0.3));
 
-  ctx.strokeStyle = `rgba(192, 192, 192, ${opacity})`;
-  ctx.lineWidth = visual.lineWeight;
+  ctx.save();
+  ctx.shadowColor = `rgba(0, 0, 0, ${0.55 * opacity})`;
+  ctx.shadowBlur = size * 0.08;
+  ctx.strokeStyle = `rgba(196, 204, 222, ${opacity})`;
+  ctx.lineWidth = stroke;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
   switch (visual.bodyShape) {
     case 'humanoid':
@@ -74,7 +80,17 @@ export function drawCreatureSilhouette(
       break;
   }
 
+  ctx.shadowBlur = 0;
+  // Front highlight to sharpen silhouette read at small sizes.
+  ctx.strokeStyle = `rgba(228, 236, 248, ${opacity * 0.26})`;
+  ctx.lineWidth = Math.max(0.9, stroke * 0.45);
+  ctx.beginPath();
+  ctx.moveTo(x - size * 0.18, y - size * 0.32);
+  ctx.lineTo(x + size * 0.06, y - size * 0.38);
+  ctx.stroke();
+
   drawCreatureEyes(ctx, x, y - size * 0.3, scale);
+  ctx.restore();
 }
 
 function drawHumanoidSilhouette(ctx: CanvasRenderingContext2D, x: number, y: number, size: number): void {

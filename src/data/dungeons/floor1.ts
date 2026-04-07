@@ -1,4 +1,4 @@
-import type { DungeonFloor, Position } from '../../engine/types';
+import type { DungeonFloor, DungeonTile, Position } from '../../engine/types';
 
 // 10x10 hand-authored grid. 1 = floor, 0 = wall
 const LAYOUT = [
@@ -17,7 +17,7 @@ const LAYOUT = [
 export const FLOOR_1_START: Position = { x: 1, y: 8 };
 
 export function createFloor1(): DungeonFloor {
-  const tiles = LAYOUT.map(row =>
+  const tiles: DungeonTile[][] = LAYOUT.map(row =>
     row.map(cell => ({
       type: cell === 1 ? 'floor' as const : 'wall' as const,
       visible: false,

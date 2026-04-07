@@ -61,7 +61,7 @@
   .hero-card {
     background: var(--bg-secondary);
     border: 1px solid var(--line-dim);
-    padding: 8px;
+    padding: 9px;
     text-align: left;
     cursor: default;
     font-family: var(--font-mono);
@@ -75,6 +75,7 @@
 
   .hero-card:not(:disabled):hover {
     border-color: var(--accent-orange);
+    box-shadow: 0 0 0 1px rgba(214, 163, 110, 0.2) inset;
   }
 
   .hero-card.dead {
@@ -84,7 +85,9 @@
   .hero-header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 11px;
+    align-items: baseline;
+    gap: 8px;
   }
 
   .hero-name {
@@ -92,7 +95,7 @@
   }
 
   .hero-class {
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 1px;
   }
 
@@ -102,33 +105,36 @@
   }
 
   .hero-stats {
-    margin-top: 4px;
+    margin-top: 6px;
     font-size: 10px;
     color: var(--text-secondary);
   }
 
   .stat-row {
     display: flex;
-    gap: 8px;
+    gap: 10px;
+    justify-content: space-between;
     margin-top: 2px;
   }
 
   .hp-bar {
-    height: 3px;
+    height: 5px;
     background: var(--line-dim);
-    margin: 2px 0;
+    margin: 4px 0;
+    border: 1px solid rgba(108, 120, 146, 0.35);
   }
 
   .hp-fill {
     height: 100%;
-    background: var(--accent-red);
+    background: linear-gradient(90deg, #9f2f2f, var(--accent-red));
     transition: width 0.3s;
   }
 
   .gear-slot {
     color: var(--accent-gold);
     font-size: 9px;
-    margin-top: 2px;
+    margin-top: 3px;
+    letter-spacing: 0.4px;
   }
 
   .compact .hero-stats {

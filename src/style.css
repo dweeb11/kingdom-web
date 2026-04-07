@@ -1,15 +1,15 @@
 :root {
-  --bg-primary: #080808;
-  --bg-secondary: #0e0e14;
-  --bg-panel: #12121e;
-  --line-bright: #c0c0c0;
-  --line-mid: #808080;
-  --line-dim: #404040;
-  --accent-orange: #ff8c00;
-  --accent-red: #ff4444;
-  --accent-gold: #ffd700;
-  --text-primary: #c0c0c0;
-  --text-secondary: #808080;
+  --bg-primary: #06080d;
+  --bg-secondary: #10141d;
+  --bg-panel: #141a26;
+  --line-bright: #c4cbdd;
+  --line-mid: #6b7892;
+  --line-dim: #3b465b;
+  --accent-orange: #d6a36e;
+  --accent-red: #d9534f;
+  --accent-gold: #d4b36f;
+  --text-primary: #c8d0e2;
+  --text-secondary: #8d9ab3;
   --font-mono: 'Courier New', Courier, monospace;
 }
 

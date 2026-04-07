@@ -35,8 +35,8 @@
   .party-bar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2px;
-    padding: 4px;
+    gap: 4px;
+    padding: 6px;
     background: var(--bg-primary);
     border-top: 1px solid var(--line-dim);
     flex-shrink: 0;
@@ -44,7 +44,8 @@
 
   .party-slot {
     background: var(--bg-secondary);
-    padding: 6px 8px;
+    border: 1px solid rgba(108, 120, 146, 0.28);
+    padding: 7px 8px;
     min-height: 40px;
     display: flex;
     flex-direction: column;
@@ -74,7 +75,7 @@
 
   .name {
     color: var(--text-primary);
-    font-size: 11px;
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -82,14 +83,14 @@
 
   .class-badge {
     font-size: 8px;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
   }
 
   .slot-stats {
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-top: 2px;
+    gap: 5px;
+    margin-top: 4px;
   }
 
   .level {
@@ -99,14 +100,15 @@
 
   .hp-wrap {
     flex: 1;
-    height: 4px;
+    height: 5px;
     background: var(--line-dim);
     min-width: 20px;
+    border: 1px solid rgba(108, 120, 146, 0.35);
   }
 
   .hp-fill {
     height: 100%;
-    background: var(--accent-red);
+    background: linear-gradient(90deg, #9f2f2f, var(--accent-red));
   }
 
   .hp-text {
