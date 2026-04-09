@@ -8,6 +8,8 @@ import {
   getVisibleTiles,
   moveEnemies,
   getFacingDelta,
+  revealTilesAroundPlayer,
+  updateDungeonVisibility,
 } from '../../src/engine/dungeon';
 import type { DungeonFloor, Position, Direction, EnemyInstance } from '../../src/engine/types';
 
@@ -174,5 +176,47 @@ describe('moveEnemies', () => {
 
     const result = moveEnemies(floor, { x: 1, y: 1 }, creatureTypes);
     expect(result.enemies[0].position).toEqual({ x: 2, y: 2 });
+  });
+});
+
+describe('visibility and fog', () => {
+  it('marks tiles around the player as visible and visited', () => {
+    const floor = makeFloor(5, 5, [
+      { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
+      { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 },
+      { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 },
+    ]);
+
+    const updated = revealTilesAroundPlayer(floor, { x: 2, y: 2 }, 1);
+    expect(updated.grid.tiles[2][2].visible).toBe(true);
+    expect(updated.grid.tiles[2][2].visited).toBe(true);
+    expect(updated.grid.tiles[1][2].visible).toBe(true);
+    expect(updated.grid.tiles[0][0].visible).toBe(false);
+  });
+
+  it('clears old visible flags while preserving visited fog', () => {
+    const floor = makeFloor(6, 6, [
+      { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 4, y: 1 },
+      { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 }, { x: 4, y: 2 },
+      { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }, { x: 4, y: 3 },
+      { x: 1, y: 4 }, { x: 2, y: 4 }, { x: 3, y: 4 }, { x: 4, y: 4 },
+    ]);
+
+    const firstReveal = revealTilesAroundPlayer(floor, { x: 2, y: 2 }, 1);
+    const secondReveal = revealTilesAroundPlayer(firstReveal, { x: 4, y: 4 }, 1);
+
+    expect(secondReveal.grid.tiles[2][2].visible).toBe(false);
+    expect(secondReveal.grid.tiles[2][2].visited).toBe(true);
+    expect(secondReveal.grid.tiles[4][4].visible).toBe(true);
+  });
+
+  it('updates only the active floor when refreshing visibility', () => {
+    const floor1 = makeFloor(5, 5, [{ x: 2, y: 2 }, { x: 2, y: 1 }]);
+    const floor2 = makeFloor(5, 5, [{ x: 1, y: 1 }, { x: 1, y: 2 }]);
+    const dungeon = createDungeonState([floor1, floor2], { x: 2, y: 2 });
+
+    const updated = updateDungeonVisibility(dungeon, 1);
+    expect(updated.floors[0].grid.tiles[2][2].visible).toBe(true);
+    expect(updated.floors[1].grid.tiles[1][1].visible).toBe(false);
   });
 });

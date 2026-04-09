@@ -198,6 +198,52 @@ export function markVisited(floor: DungeonFloor, position: Position): DungeonFlo
   };
 }
 
+export function revealTilesAroundPlayer(
+  floor: DungeonFloor,
+  playerPosition: Position,
+  range: number,
+): DungeonFloor {
+  const maxDistance = Math.max(1, range);
+  const tiles = floor.grid.tiles.map(row => row.map(tile => ({ ...tile, visible: false })));
+
+  for (let y = 0; y < floor.grid.height; y++) {
+    for (let x = 0; x < floor.grid.width; x++) {
+      const distance = Math.abs(playerPosition.x - x) + Math.abs(playerPosition.y - y);
+      if (distance <= maxDistance) {
+        const current = tiles[y][x];
+        tiles[y][x] = {
+          ...current,
+          visible: true,
+          visited: true,
+        };
+      }
+    }
+  }
+
+  return {
+    ...floor,
+    grid: {
+      ...floor.grid,
+      tiles,
+    },
+  };
+}
+
+export function updateDungeonVisibility(
+  dungeon: DungeonState,
+  range: number,
+): DungeonState {
+  const floor = dungeon.floors[dungeon.currentFloor];
+  const visibleFloor = revealTilesAroundPlayer(floor, dungeon.playerPosition, range);
+
+  return {
+    ...dungeon,
+    floors: dungeon.floors.map((existing, index) =>
+      index === dungeon.currentFloor ? visibleFloor : existing
+    ),
+  };
+}
+
 export function createDungeonState(floors: DungeonFloor[], startPos: Position): DungeonState {
   return {
     floors,

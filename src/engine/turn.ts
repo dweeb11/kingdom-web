@@ -2,15 +2,16 @@ import type { GameState, GameAction, DungeonState, Hero } from './types';
 import { createInitialState } from './state';
 import { buySupplies, calculateHireCost, calculateLoot, canAfford, spendGold, consumeSupplies } from './economy';
 import { canEquip, equipGear, unequipGear, applyXp } from './heroes';
-import { moveForward, moveBackward, turnLeft, turnRight, checkEncounter, markVisited, createDungeonState, moveEnemies } from './dungeon';
+import { moveForward, moveBackward, turnLeft, turnRight, checkEncounter, createDungeonState, moveEnemies, revealTilesAroundPlayer, updateDungeonVisibility } from './dungeon';
 import { initCombat, resolveAttack, resolveDefend, resolveFlee, advanceTurn, decideEnemyAction, heroToCombatant, enemyToCombatant } from './combat';
 import { scaleForFloor, getCreatureType, spawnEnemy } from './creatures';
 import { GEAR } from '../data/gear';
 import { CREATURE_TYPES } from '../data/creatures';
-import { MAX_PARTY_SIZE, STEPS_PER_SUPPLY, STARVATION_DAMAGE } from './constants';
+import { MAX_PARTY_SIZE, STEPS_PER_SUPPLY, STARVATION_DAMAGE, TORCH_VISIBILITY, DARK_VISIBILITY } from './constants';
 import { createFloor1, FLOOR_1_START } from '../data/dungeons/floor1';
 import { createFloor2 } from '../data/dungeons/floor2';
 import { createFloor3 } from '../data/dungeons/floor3';
+import { generateProceduralDungeon } from './procedural';
 
 import type { CombatState } from './types';
 
@@ -63,6 +64,30 @@ function spawnFloorEnemies(floorNumber: number): import('./types').EnemyInstance
     const type = CREATURE_TYPES[typeId];
     return spawnEnemy(type, pos, floorNumber);
   });
+}
+
+const USE_HAND_AUTHORED_DUNGEON = false;
+
+function getVisibilityRange(torchCount: number): number {
+  return torchCount > 0 ? TORCH_VISIBILITY : DARK_VISIBILITY;
+}
+
+function createDungeonRun(torchCount: number): DungeonState {
+  if (USE_HAND_AUTHORED_DUNGEON) {
+    const floor1 = createFloor1();
+    floor1.enemies = spawnFloorEnemies(0);
+    const floor2 = createFloor2();
+    floor2.enemies = spawnFloorEnemies(1);
+    const floor3 = createFloor3();
+    floor3.enemies = spawnFloorEnemies(2);
+
+    const startState = createDungeonState([floor1, floor2, floor3], FLOOR_1_START);
+    return updateDungeonVisibility(startState, getVisibilityRange(torchCount));
+  }
+
+  const generated = generateProceduralDungeon(CREATURE_TYPES);
+  const startState = createDungeonState(generated.floors, generated.startPosition);
+  return updateDungeonVisibility(startState, getVisibilityRange(torchCount));
 }
 
 export function resolveTurn(state: GameState, action: GameAction): GameState {
@@ -151,15 +176,7 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       const aliveHeroes = state.kingdom.heroRoster.filter(h => h.alive);
       if (aliveHeroes.length === 0) return state;
       const partyIds = aliveHeroes.map(h => h.id);
-
-      const floor1 = createFloor1();
-      floor1.enemies = spawnFloorEnemies(0);
-      const floor2 = createFloor2();
-      floor2.enemies = spawnFloorEnemies(1);
-      const floor3 = createFloor3();
-      floor3.enemies = spawnFloorEnemies(2);
-
-      const dungeon = createDungeonState([floor1, floor2, floor3], FLOOR_1_START);
+      const dungeon = createDungeonRun(state.kingdom.resources.torches);
 
       return {
         ...state,
@@ -242,7 +259,9 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
       for (const [id, ct] of Object.entries(CREATURE_TYPES)) {
         creatureMovementInfo[id] = { movement: ct.movement, detectionRange: ct.detectionRange, fleeThreshold: ct.fleeThreshold };
       }
-      const updatedFloor = moved ? moveEnemies(markVisited(floor, newPos), newPos, creatureMovementInfo) : floor;
+      const visibilityRange = getVisibilityRange(resources.torches);
+      const floorWithVision = revealTilesAroundPlayer(floor, newPos, visibilityRange);
+      const updatedFloor = moved ? moveEnemies(floorWithVision, newPos, creatureMovementInfo) : floorWithVision;
 
       // Also check AFTER enemy movement (enemy walks into player)
       if (!encounter && moved) {
@@ -302,14 +321,16 @@ export function resolveTurn(state: GameState, action: GameAction): GameState {
         }
       }
 
+      const descendedDungeon = {
+        ...d,
+        currentFloor: nextFloor,
+        playerPosition: spawnPos,
+        playerFacing: 'N' as const,
+      };
+
       return {
         ...state,
-        dungeon: {
-          ...d,
-          currentFloor: nextFloor,
-          playerPosition: spawnPos,
-          playerFacing: 'N',
-        },
+        dungeon: updateDungeonVisibility(descendedDungeon, getVisibilityRange(state.kingdom.resources.torches)),
       };
     }
 
